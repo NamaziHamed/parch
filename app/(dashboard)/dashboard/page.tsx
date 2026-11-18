@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Loader2 } from "lucide-react";
-import Sidebar from "@/components/dashboard/Sidebar";
+import AppHeader from "@/components/dashboard/AppHeader";
+import NotesSkeleton from "@/components/dashboard/NotesSkeleton";
+import { EmptyNotebook, NoResults } from "@/components/dashboard/EmptyState";
 import MasonaryLayout from "@/components/dashboard/MasonaryLayout";
 import AddNewNote from "@/components/dashboard/AddNewNote";
 import SearchBox from "@/components/dashboard/SearchBox";
@@ -15,6 +16,8 @@ const DashboardPage = () => {
   const [data, setData] = useState<NoteData[]>([]);
   const [filtered, setFiltered] = useState(data);
   const [searchText, setSearchText] = useState("");
+  // UI-only flag so we can show skeletons instead of an empty state on first load.
+  const [isFetching, setIsFetching] = useState(true);
 
   const handleSearch = (value: string) => {
     setSearchText(value);
@@ -42,6 +45,8 @@ const DashboardPage = () => {
         }
       } catch (error) {
         console.error(error);
+      } finally {
+        setIsFetching(false);
       }
     };
 
@@ -64,27 +69,46 @@ const DashboardPage = () => {
     }
   };
 
-  if (status === "loading")
-    return (
-      <div className="min-w-screen min-h-screen flex items-center justify-center gap-3">
-        <Loader2 className="animate-spin w-6 h-6 text-primary" />
-        <p>Loading ...</p>
-      </div>
-    );
+  const isLoading = status === "loading" || isFetching;
+  const firstName = session?.user?.name?.split(" ")[0];
+
   return (
-    <main>
-      <Sidebar session={session} />
-      <div>
-        <div className="ps-24 pt-10 pe-3 w-full gap-4">
-          <h2 className="font-semibold text-2xl text-primary mb-4">
-            All notes
-          </h2>
-          <SearchBox text={searchText} search={handleSearch} />
+    <div className="min-h-dvh">
+      <AppHeader session={session} />
+      <main className="mx-auto max-w-7xl px-4 pt-8 pb-24 sm:px-6 sm:pt-12">
+        <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">
+              {firstName ? `Hello, ${firstName}` : "Your notebook"}
+            </p>
+            <h1 className="mt-1 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+              All notes
+              {!isLoading && data.length > 0 && (
+                <span className="ms-3 align-middle font-sans text-sm font-normal text-muted-foreground tabular-nums">
+                  {searchText
+                    ? `${filtered.length} of ${data.length}`
+                    : data.length}
+                </span>
+              )}
+            </h1>
+          </div>
+          {(isLoading || data.length > 0) && (
+            <SearchBox text={searchText} search={handleSearch} />
+          )}
         </div>
-        <MasonaryLayout data={filtered} onRemove={handleRemove} />
-      </div>
+
+        {isLoading ? (
+          <NotesSkeleton />
+        ) : data.length === 0 ? (
+          <EmptyNotebook />
+        ) : filtered.length === 0 ? (
+          <NoResults query={searchText} onClear={() => handleSearch("")} />
+        ) : (
+          <MasonaryLayout data={filtered} onRemove={handleRemove} />
+        )}
+      </main>
       <AddNewNote />
-    </main>
+    </div>
   );
 };
 
