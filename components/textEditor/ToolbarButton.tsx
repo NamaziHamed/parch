@@ -1,11 +1,14 @@
 import React, { ReactNode } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
 
 interface IToolbarButtonProps {
   title: string;
   command?: () => void;
-  isActive: boolean;
+  /** Omit for plain actions (undo/redo); pass a boolean for toggles. */
+  isActive?: boolean;
+  disabled?: boolean;
+  shortcut?: string;
   children: ReactNode;
 }
 
@@ -13,26 +16,37 @@ const ToolbarButton = ({
   title,
   command,
   isActive,
+  disabled,
+  shortcut,
   children,
 }: IToolbarButtonProps) => {
   return (
-    <Tooltip key={title}>
+    <Tooltip>
       <TooltipTrigger asChild>
-        <Button
-          size={"sm"}
-          variant={"ghost"}
+        <button
+          type="button"
           onClick={command}
-          disabled={(title === "Redo" || title === "Undo") && !isActive}
-          className={`${
-            !(title === "Redo" || title === "Undo") && isActive
-              ? "border border-primary text-primary"
-              : "border-0 text-foreground"
-          }  transition-all duration-300 cursor-pointer disabled:bg-gray-700`}
+          disabled={disabled}
+          aria-label={title}
+          aria-pressed={isActive === undefined ? undefined : isActive}
+          className={cn(
+            "grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground transition-colors",
+            "hover:bg-accent hover:text-foreground",
+            "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+            "disabled:pointer-events-none disabled:opacity-35",
+            "[&_svg]:size-4",
+            isActive && "bg-accent text-primary hover:text-primary"
+          )}
         >
           {children}
-        </Button>
+        </button>
       </TooltipTrigger>
-      <TooltipContent>{title}</TooltipContent>
+      <TooltipContent className="flex items-center gap-2">
+        {title}
+        {shortcut && (
+          <kbd className="font-mono text-[0.65rem] opacity-70">{shortcut}</kbd>
+        )}
+      </TooltipContent>
     </Tooltip>
   );
 };

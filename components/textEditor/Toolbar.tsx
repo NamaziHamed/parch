@@ -4,13 +4,22 @@ import { Editor, useEditorState } from "@tiptap/react";
 import {
   BoldIcon,
   ItalicIcon,
+  ListIcon,
+  ListOrderedIcon,
+  ListTodoIcon,
+  Redo2Icon,
   StrikethroughIcon,
   UnderlineIcon,
+  Undo2Icon,
 } from "lucide-react";
 import { BubbleMenu } from "@tiptap/react/menus";
 import ToolbarButton from "./ToolbarButton";
-import ToolbarDropdownButton from "./ToolbarDropdownButton";
+import { AlignMenu, BlockTypeMenu } from "./ToolbarDropdownButton";
 import ColorSeterButtons from "./ColorSeterButtons";
+
+const Divider = () => (
+  <span aria-hidden="true" className="mx-1 h-5 w-px shrink-0 bg-border" />
+);
 
 const Toolbar = ({ editor }: { editor: Editor }) => {
   const editorState = useEditorState({
@@ -35,60 +44,136 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
         currentBgColor:
           ctx.editor.getAttributes("textStyle").backgroundColor ?? "",
         currentTextColor: ctx.editor.getAttributes("textStyle").color ?? "",
+        canUndo: ctx.editor.can().undo(),
+        canRedo: ctx.editor.can().redo(),
       };
     },
   });
 
-  const tools = [
+  const markTools = [
     {
       title: "Bold",
+      shortcut: "Ctrl B",
       Icon: BoldIcon,
       command: () => editor.chain().focus().toggleBold().run(),
       isActive: editorState.isBold,
     },
     {
-      title: "Italice",
+      title: "Italic",
+      shortcut: "Ctrl I",
       Icon: ItalicIcon,
       command: () => editor.chain().focus().toggleItalic().run(),
       isActive: editorState.isItalic,
     },
     {
       title: "Underline",
+      shortcut: "Ctrl U",
       Icon: UnderlineIcon,
       command: () => editor.chain().focus().toggleUnderline().run(),
       isActive: editorState.isUnderline,
     },
     {
-      title: "Strike",
+      title: "Strikethrough",
+      shortcut: "Ctrl Shift S",
       Icon: StrikethroughIcon,
       command: () => editor.chain().focus().toggleStrike().run(),
       isActive: editorState.isStrike,
     },
   ];
 
+  const listTools = [
+    {
+      title: "Bullet list",
+      Icon: ListIcon,
+      command: () => editor.chain().focus().toggleBulletList().run(),
+      isActive: editorState.isBulletList,
+    },
+    {
+      title: "Numbered list",
+      Icon: ListOrderedIcon,
+      command: () => editor.chain().focus().toggleOrderedList().run(),
+      isActive: editorState.isOrderedList,
+    },
+    {
+      title: "Checklist",
+      Icon: ListTodoIcon,
+      command: () => editor.chain().focus().toggleTaskList().run(),
+      isActive: editorState.isTaskList,
+    },
+  ];
+
   return (
-    <BubbleMenu editor={editor}>
+    <>
+      {/* Persistent toolbar */}
       <div
-        className="w-fit bg-muted border border-zinc-300 px-2 py-1 flex
-        items-center justify-between sm:justify-start  rounded-md
-    "
+        role="toolbar"
+        aria-label="Formatting"
+        className="flex items-center overflow-x-auto rounded-xl border bg-card/90 p-1 shadow-paper backdrop-blur-md [scrollbar-width:none] supports-[backdrop-filter]:bg-card/75"
       >
-        {tools.map(({ title, Icon, command, isActive }) => (
+        <ToolbarButton
+          title="Undo"
+          shortcut="Ctrl Z"
+          command={() => editor.chain().focus().undo().run()}
+          disabled={!editorState.canUndo}
+        >
+          <Undo2Icon />
+        </ToolbarButton>
+        <ToolbarButton
+          title="Redo"
+          shortcut="Ctrl Shift Z"
+          command={() => editor.chain().focus().redo().run()}
+          disabled={!editorState.canRedo}
+        >
+          <Redo2Icon />
+        </ToolbarButton>
+        <Divider />
+        <BlockTypeMenu editor={editor} editorState={editorState} />
+        <Divider />
+        {markTools.map(({ title, Icon, command, isActive, shortcut }) => (
           <ToolbarButton
+            key={title}
+            title={title}
+            shortcut={shortcut}
+            command={command}
+            isActive={isActive}
+          >
+            <Icon />
+          </ToolbarButton>
+        ))}
+        <Divider />
+        {listTools.map(({ title, Icon, command, isActive }) => (
+          <ToolbarButton
+            key={title}
             title={title}
             command={command}
             isActive={isActive}
-            key={title}
           >
-            <Icon className="h-3 w-3" />
+            <Icon />
           </ToolbarButton>
         ))}
-        <div className="bg-white w-0.5 mx-1 h-6"></div>
+        <Divider />
+        <AlignMenu editor={editor} editorState={editorState} />
+        <Divider />
         <ColorSeterButtons editor={editor} editorState={editorState} />
-        <div className="bg-white w-0.5 mx-1 h-6"></div>
-        <ToolbarDropdownButton editor={editor} editorState={editorState} />
       </div>
-    </BubbleMenu>
+
+      {/* Quick formatting on text selection */}
+      <BubbleMenu editor={editor}>
+        <div className="flex items-center gap-0.5 rounded-lg border bg-popover p-1 shadow-lifted animate-in fade-in-0 zoom-in-95 duration-150">
+          {markTools.map(({ title, Icon, command, isActive, shortcut }) => (
+            <ToolbarButton
+              key={title}
+              title={title}
+              shortcut={shortcut}
+              command={command}
+              isActive={isActive}
+            >
+              <Icon />
+            </ToolbarButton>
+          ))}
+        </div>
+      </BubbleMenu>
+    </>
   );
 };
 

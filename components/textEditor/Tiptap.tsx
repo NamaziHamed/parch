@@ -39,7 +39,12 @@ const Tiptap = ({
     content: text,
     autofocus: true,
     editorProps: {
-      attributes: { class: "bg-card rounded-b-xl min-h-[83vh]" },
+      attributes: {
+        class: "min-h-[60vh] pb-32",
+        "aria-label": "Note content",
+        "aria-multiline": "true",
+        role: "textbox",
+      },
     },
     onUpdate: ({ editor }) => {
       const json = editor.getJSON();
@@ -51,8 +56,10 @@ const Tiptap = ({
   if (!editor) return null;
 
   return (
-    <div className="">
-      <Toolbar editor={editor} />
+    <div>
+      <div className="sticky top-14 z-20 -mx-1 pt-2 pb-6">
+        <Toolbar editor={editor} />
+      </div>
       <EditorContent editor={editor} />
     </div>
   );

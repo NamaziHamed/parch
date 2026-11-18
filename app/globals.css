@@ -231,6 +231,10 @@
   .tiptap span[style*="background-color"] {
     @apply rounded-[3px] px-0.5;
   }
+  /* Highlights are light pastels: keep text dark on them in dark mode. */
+  .dark .tiptap span[style*="background-color"] {
+    color: oklch(0.25 0.018 60);
+  }
 
   /* Task list */
   .tiptap ul[data-type="taskList"] {

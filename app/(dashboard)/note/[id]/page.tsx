@@ -2,8 +2,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import Tiptap from "@/components/textEditor/Tiptap";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ArrowBigLeft, Loader2Icon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ThemeToggle } from "@/components/brand/ThemeToggle";
+import SaveStatus from "@/components/textEditor/SaveStatus";
+import { ChevronLeftIcon } from "lucide-react";
 import { JSONContent } from "@tiptap/react";
 import axios from "axios";
 import Link from "next/link";
@@ -82,44 +84,67 @@ const NotePage = () => {
     };
   }, []);
 
+  const header = (
+    <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/65">
+      <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-3 px-4 sm:px-6">
+        <Button asChild variant="ghost" size="sm" className="-ms-2 text-muted-foreground hover:text-foreground">
+          <Link href={"/dashboard"}>
+            <ChevronLeftIcon />
+            <span>All notes</span>
+          </Link>
+        </Button>
+        <div className="flex items-center gap-2">
+          {!isLoading && (
+            <SaveStatus isNew={noteData.id === "new"} hasChanged={noteData.hasChanged} />
+          )}
+          <ThemeToggle />
+        </div>
+      </div>
+    </header>
+  );
+
   if (isLoading) {
     return (
-      <div className="flex gap-2 items-center min-w-screen min-h-screen justify-center">
-        <Loader2Icon className="text-primary w-8 h-8 animate-spin" />
-        <span className="animate-pulse">Loading...</span>
+      <div className="min-h-dvh">
+        {header}
+        <div role="status" aria-label="Loading note" className="mx-auto max-w-3xl px-4 pt-10 sm:px-6">
+          <Skeleton className="h-10 w-2/3" />
+          <Skeleton className="mt-8 h-10 w-full rounded-xl" />
+          <div className="mt-10 space-y-3">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-11/12" />
+            <Skeleton className="h-4 w-4/5" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-2/3" />
+          </div>
+          <span className="sr-only">Loading note…</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="pt-24 relative">
-      <div
-        className="h-24 w-full fixed top-0 left-0 py-6 px-3 bg-zinc-950 z-10
-      border-b border-white"
-      >
-        <Button variant={"outline"} asChild>
-          <Link href={"/dashboard"} className="flex gap-2 items-center">
-            <ArrowBigLeft />
-            <span>Dashboard</span>
-          </Link>
-        </Button>
-      </div>
-      <Input
-        className="py-9 text-2xl md:text-3xl lg:text-4xl font-bold border-b"
-        placeholder="Untitled"
-        value={noteData.title}
-        onChange={(e) => {
-          setNoteData({ ...noteData, title: e.target.value, hasChanged: true });
-        }}
-      />
+    <div className="min-h-dvh">
+      {header}
+      <main className="mx-auto max-w-3xl px-4 pt-8 sm:px-6 sm:pt-12 animate-in fade-in-0 duration-300">
+        <input
+          className="w-full bg-transparent font-serif text-3xl leading-tight font-semibold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/50 sm:text-[2.6rem]"
+          placeholder="Untitled"
+          aria-label="Note title"
+          value={noteData.title}
+          onChange={(e) => {
+            setNoteData({ ...noteData, title: e.target.value, hasChanged: true });
+          }}
+        />
 
-      <Tiptap
-        key={noteData.id}
-        initialValue={noteData.jsonText}
-        onChange={(newContent: JSONContent) => {
-          setNoteData({ ...noteData, jsonText: newContent, hasChanged: true });
-        }}
-      />
+        <Tiptap
+          key={noteData.id}
+          initialValue={noteData.jsonText}
+          onChange={(newContent: JSONContent) => {
+            setNoteData({ ...noteData, jsonText: newContent, hasChanged: true });
+          }}
+        />
+      </main>
     </div>
   );
 };

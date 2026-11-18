@@ -1,6 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
+import React from "react";
 import { EditorActiveState } from "@/utils/types";
 import { Editor } from "@tiptap/react";
 import {
@@ -8,186 +7,163 @@ import {
   AlignJustifyIcon,
   AlignLeftIcon,
   AlignRightIcon,
+  CheckIcon,
   ChevronDownIcon,
-  Heading,
   Heading1Icon,
   Heading2Icon,
   Heading3Icon,
-  ListIcon,
-  ListOrderedIcon,
-  ListTodoIcon,
-  LucideList,
   PilcrowIcon,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { cn } from "@/lib/utils";
 
-const ToolbarDropdownButton = ({
-  editorState,
-  editor,
+type Option = {
+  title: string;
+  Icon: React.ComponentType<{ className?: string }>;
+  command: () => void;
+  isActive: boolean;
+};
+
+const triggerClass =
+  "inline-flex h-8 shrink-0 items-center gap-1 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[state=open]:bg-accent data-[state=open]:text-foreground";
+
+const Dropdown = ({
+  label,
+  options,
+  children,
+  triggerClassName,
 }: {
-  editorState: EditorActiveState;
-  editor: Editor;
-}) => {
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  label: string;
+  options: Option[];
+  children: React.ReactNode;
+  triggerClassName?: string;
+}) => (
+  <DropdownMenu modal={false}>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <DropdownMenuTrigger aria-label={label} className={cn(triggerClass, triggerClassName)}>
+          {children}
+          <ChevronDownIcon className="size-3 opacity-60" />
+        </DropdownMenuTrigger>
+      </TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
+    <DropdownMenuContent
+      align="start"
+      className="min-w-44"
+      onCloseAutoFocus={(e) => e.preventDefault()}
+    >
+      {options.map(({ title, Icon, command, isActive }) => (
+        <DropdownMenuItem
+          key={title}
+          onSelect={command}
+          className={cn(isActive && "text-primary")}
+        >
+          <Icon className="size-4" />
+          <span className="flex-1">{title}</span>
+          {isActive && <CheckIcon className="size-3.5" />}
+        </DropdownMenuItem>
+      ))}
+    </DropdownMenuContent>
+  </DropdownMenu>
+);
 
-  const handleMenuToggle = (title: string) => {
-    setOpenMenu((current) => (current === title ? null : title));
-  };
+type MenuProps = { editorState: EditorActiveState; editor: Editor };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpenMenu(null);
-      }
-    };
-
-    if (openMenu) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [openMenu]);
-
-  const dropdownItems = [
+/** "Text style" menu: paragraph / heading levels. */
+export const BlockTypeMenu = ({ editorState, editor }: MenuProps) => {
+  const options: Option[] = [
     {
-      title: "Heading",
-      Icon: Heading,
-      isOpen: openMenu === "Heading",
-      command: () => handleMenuToggle("Heading"),
-      dropdowns: [
-        {
-          title: "Heading 1",
-          Icon: Heading1Icon,
-          command: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
-          isActive: editorState.isHeading1,
-        },
-        {
-          title: "Heading 2",
-          Icon: Heading2Icon,
-          command: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
-          isActive: editorState.isHeading2,
-        },
-        {
-          title: "Heading 3",
-          Icon: Heading3Icon,
-          command: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
-          isActive: editorState.isHeading3,
-        },
-        {
-          title: "Paragraph",
-          Icon: PilcrowIcon,
-          command: () => editor.chain().focus().setParagraph().run(),
-          isActive: editorState.isParagraph,
-        },
-      ],
+      title: "Paragraph",
+      Icon: PilcrowIcon,
+      command: () => editor.chain().focus().setParagraph().run(),
+      isActive:
+        editorState.isParagraph &&
+        !editorState.isHeading1 &&
+        !editorState.isHeading2 &&
+        !editorState.isHeading3,
     },
     {
-      title: "Lists",
-      Icon: LucideList,
-      isOpen: openMenu === "Lists",
-      command: () => handleMenuToggle("Lists"),
-      dropdowns: [
-        {
-          title: "Ordered List",
-          Icon: ListOrderedIcon,
-          command: () => editor.chain().focus().toggleOrderedList().run(),
-          isActive: editorState.isOrderedList,
-        },
-        {
-          title: "Bullet list",
-          Icon: ListIcon,
-          command: () => editor.chain().focus().toggleBulletList().run(),
-          isActive: editorState.isBulletList,
-        },
-        {
-          title: "Check list",
-          Icon: ListTodoIcon,
-          command: () => editor.chain().focus().toggleTaskList().run(),
-          isActive: editorState.isTaskList,
-        },
-      ],
+      title: "Heading 1",
+      Icon: Heading1Icon,
+      command: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
+      isActive: editorState.isHeading1,
     },
     {
-      title: "Alignments",
-      Icon: AlignCenterIcon,
-      isOpen: openMenu === "Alignments",
-      command: () => handleMenuToggle("Alignments"),
-      dropdowns: [
-        {
-          title: "Justify Left",
-          Icon: AlignLeftIcon,
-          command: () => editor.chain().focus().setTextAlign("left").run(),
-          isActive: editorState.isAlignLeft,
-        },
-        {
-          title: "Align Right",
-          Icon: AlignRightIcon,
-          command: () => editor.chain().focus().setTextAlign("right").run(),
-          isActive: editorState.isAlignRight,
-        },
-        {
-          title: "Align Center",
-          Icon: AlignCenterIcon,
-          command: () => editor.chain().focus().setTextAlign("center").run(),
-          isActive: editorState.isAlignCenter,
-        },
-        {
-          title: "Justify",
-          Icon: AlignJustifyIcon,
-          command: () => editor.chain().focus().setTextAlign("justify").run(),
-          isActive: editorState.isJustify,
-        },
-      ],
+      title: "Heading 2",
+      Icon: Heading2Icon,
+      command: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
+      isActive: editorState.isHeading2,
+    },
+    {
+      title: "Heading 3",
+      Icon: Heading3Icon,
+      command: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
+      isActive: editorState.isHeading3,
     },
   ];
+  const current =
+    options.slice(1).find((o) => o.isActive)?.title ?? "Paragraph";
 
   return (
-    <div className="space-x-0.5 flex items-center" ref={dropdownRef}>
-      {dropdownItems.map((item) => (
-        <div key={item.title} className="relative">
-          <Button
-            variant={"ghost"}
-            size={"sm"}
-            onClick={item.command}
-            className="flex items-center gap-1"
-          >
-            <item.Icon className="w-4 h-4" />
-            <ChevronDownIcon
-              className={`w-3 h-3 transition-transform ${
-                item.isOpen ? "rotate-180" : ""
-              }`}
-            />
-          </Button>
-
-          {item.isOpen && (
-            <div
-              className="absolute right-0 mt-1 top-full bg-muted border rounded-md
-             flex flex-col z-50 justify-start shadow-lg"
-            >
-              {item.dropdowns.map((subItem) => (
-                <Button
-                  variant={subItem.isActive ? "secondary" : "ghost"}
-                  size={"sm"}
-                  key={subItem.title}
-                  onClick={() => {
-                    subItem.command();
-                    setOpenMenu(null); // Close menu after selection
-                  }}
-                  className="justify-start gap-2 px-2"
-                >
-                  <subItem.Icon className="w-4 h-4" />
-                  <span>{subItem.title}</span>
-                </Button>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
+    <Dropdown
+      label="Text style"
+      options={options}
+      triggerClassName="w-[7.25rem] justify-between"
+    >
+      <span className="truncate text-foreground">{current}</span>
+    </Dropdown>
   );
 };
 
-export default ToolbarDropdownButton;
+/** Alignment menu; the trigger mirrors the current alignment. */
+export const AlignMenu = ({ editorState, editor }: MenuProps) => {
+  const options: Option[] = [
+    {
+      title: "Align left",
+      Icon: AlignLeftIcon,
+      command: () => editor.chain().focus().setTextAlign("left").run(),
+      isActive: editorState.isAlignLeft,
+    },
+    {
+      title: "Align center",
+      Icon: AlignCenterIcon,
+      command: () => editor.chain().focus().setTextAlign("center").run(),
+      isActive: editorState.isAlignCenter,
+    },
+    {
+      title: "Align right",
+      Icon: AlignRightIcon,
+      command: () => editor.chain().focus().setTextAlign("right").run(),
+      isActive: editorState.isAlignRight,
+    },
+    {
+      title: "Justify",
+      Icon: AlignJustifyIcon,
+      command: () => editor.chain().focus().setTextAlign("justify").run(),
+      isActive: editorState.isJustify,
+    },
+  ];
+  const CurrentIcon = options.find((o) => o.isActive)?.Icon ?? AlignLeftIcon;
 
+  return (
+    <Dropdown label="Alignment" options={options}>
+      <CurrentIcon className="size-4" />
+    </Dropdown>
+  );
+};
+
+const ToolbarDropdownButton = (props: MenuProps) => (
+  <>
+    <BlockTypeMenu {...props} />
+    <AlignMenu {...props} />
+  </>
+);
+
+export default ToolbarDropdownButton;
