@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { Loader2Icon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
@@ -45,17 +46,19 @@ const LoginForm = () => {
 
   return (
     <Form {...form}>
-      <form className="space-y-7" onSubmit={form.handleSubmit(onSubmit)}>
+      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
-            <FormItem className="space-y-1">
-              <FormLabel>Email: </FormLabel>
+            <FormItem>
+              <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
                   type="email"
-                  placeholder="example@example.com"
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  className="h-10 bg-card"
                   {...field}
                 />
               </FormControl>
@@ -67,10 +70,16 @@ const LoginForm = () => {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem className="space-y-1">
-              <FormLabel>Password: </FormLabel>
+            <FormItem>
+              <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="******" {...field} />
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  className="h-10 bg-card"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -80,9 +89,12 @@ const LoginForm = () => {
         <Button
           disabled={form.formState.isSubmitting}
           type="submit"
-          className="w-full mb-4 cursor-pointer"
+          className="mt-2 h-11 w-full text-[0.95rem]"
         >
-          Login
+          {form.formState.isSubmitting && (
+            <Loader2Icon className="animate-spin" aria-hidden="true" />
+          )}
+          Sign in
         </Button>
       </form>
     </Form>

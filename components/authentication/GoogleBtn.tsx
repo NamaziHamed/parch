@@ -13,7 +13,7 @@ export default function GoogleBtn() {
   return (
     <Button
       variant={"outline"}
-      className="w-full mb-4 cursor-pointer flex gap-2 py-5"
+      className="h-11 w-full gap-2.5 bg-card text-[0.95rem] shadow-paper"
       type="button"
       onClick={onClick}
     >
