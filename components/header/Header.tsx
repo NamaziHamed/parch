@@ -1,32 +1,23 @@
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { Button } from "../ui/button";
-import { LogInIcon, UserPlus2 } from "lucide-react";
+import { Logo } from "../brand/Logo";
+import { ThemeToggle } from "../brand/ThemeToggle";
 
 const Header = () => {
   return (
-    <header
-      className="absolute top-0 left-0 w-full h-20 bg-card z-50 flex items-center justify-between
-      p-3"
-    >
-      <div>
-        <Link href={".."}>
-          <Image src={"/logo.png"} width={120} height={50} alt="Parch logo" />
-        </Link>
-      </div>
-      <div className="space-x-2">
-        <Button asChild size={"sm"} variant={"default"}>
-          <Link href={"/login"}>
-            <LogInIcon /> Login
-          </Link>
-        </Button>
-
-        <Button asChild size={"sm"} variant={"outline"}>
-          <Link href={"/register"}>
-            <UserPlus2 /> Signup
-          </Link>
-        </Button>
+    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/65">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+        <Logo />
+        <nav aria-label="Account" className="flex items-center gap-1 sm:gap-2">
+          <ThemeToggle />
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/login">Sign in</Link>
+          </Button>
+          <Button asChild size="sm">
+            <Link href="/register">Get started</Link>
+          </Button>
+        </nav>
       </div>
     </header>
   );

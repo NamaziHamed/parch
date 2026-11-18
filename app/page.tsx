@@ -1,90 +1,163 @@
+import Link from "next/link";
 import Header from "@/components/header/Header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Logo } from "@/components/brand/Logo";
+import { EditorPreview } from "@/components/landing/EditorPreview";
 import {
   ArrowRightIcon,
-  FastForwardIcon,
-  LucideToolCase,
-  SearchCheckIcon,
+  CloudIcon,
+  LayoutGridIcon,
+  MoonStarIcon,
+  PenLineIcon,
+  SearchIcon,
+  ShieldCheckIcon,
 } from "lucide-react";
-import Link from "next/link";
 
 const features = [
   {
-    id: 2,
-    title: "Search system",
-    content: "You can search your notes with title or text",
-    Icon: SearchCheckIcon,
-    iconColor: "text-blue-500",
+    title: "Rich text, without the clutter",
+    content:
+      "Headings, lists, checklists, alignment, colour and highlights. Everything you need, tucked away until you need it.",
+    Icon: PenLineIcon,
   },
   {
-    id: 1,
-    title: "Easy signup",
+    title: "Autosave you never think about",
     content:
-      "Using out third party login system, you can register and login on the go",
-    Icon: FastForwardIcon,
-    iconColor: "text-red-500",
+      "Close the tab, walk away. Parch keeps your words safe so you never have to hunt for a save button.",
+    Icon: CloudIcon,
   },
-
   {
-    id: 3,
-    title: "User Friendly tools",
+    title: "Find anything, instantly",
     content:
-      "No extra tools, just the things you need. headings, text alignment, lists, color and highlight changer",
-    Icon: LucideToolCase,
-    iconColor: "text-violet-300",
+      "Search across every title and every line of text. Your notes appear as you type.",
+    Icon: SearchIcon,
+  },
+  {
+    title: "A board for your thoughts",
+    content:
+      "Notes settle into a calm masonry grid, freshest first, so long and short ideas sit happily together.",
+    Icon: LayoutGridIcon,
+  },
+  {
+    title: "Sign in your way",
+    content:
+      "One click with Google, or a classic email and password. Your notebook is private to you.",
+    Icon: ShieldCheckIcon,
+  },
+  {
+    title: "Easy on the eyes, day or night",
+    content:
+      "A warm paper theme by day and a lamplit dark mode by night, following your system automatically.",
+    Icon: MoonStarIcon,
   },
 ];
 
 export default function Home() {
   return (
-    <div className="min-w-screen min-h-screen relative">
-      <div className="absolute top-0 left-0 inset-0 bg-[url('/banner.png')] bg-cover bg-center z-0 opacity-40"></div>
+    <div className="flex min-h-dvh flex-col">
       <Header />
-      <div className=" pt-20 absolute min-w-screen min-h-screen flex flex-col justify-around items-center">
-        <div
-          className="
-          flex items-center justify-center flex-col text-white z-40 space-y-5"
-        >
-          <h2 className="font-bold text-pretty text-primary text-4xl md:text-5xl lg:text-6xl xl:text-7xl
-            animate-in slide-in-from-top-80 duration-500 fade-in-0
-          ">
-            Your second brain is here!
-          </h2>
-          <p>Write down your thoughts, get them out of your head!</p>
-          <Button
-            asChild
-            size={"lg"}
-            className="group hover:-translate-y-0.5 
-              animate-in slide-in-from-bottom-80 duration-500 fade-in-0
-              scale-110 transition-all "
-          >
-            <Link href={"/register"}>
-              <ArrowRightIcon className="group-hover:animate-caret-blink" /> Get
-              started
-            </Link>
-          </Button>
-        </div>
 
-        <div className="grid grid-cols-1  md:grid-cols-3 gap-2 md:gap-5 py-10 max-w-3xl">
-          {features.map(({ id, title, content, Icon, iconColor }) => (
-            <Card
-              key={id}
-              className="shadow-none hover:scale-105 hover:-translate-y-0.5 duration-300 transition-all"
-            >
-              <CardContent>
-                <CardTitle className="font-semibold italic mb-3 text-center">
-                  {title}
-                </CardTitle>
-                <Icon className={`w-5 h-5 mx-auto ${iconColor} mb-1`} />
-                <p className="text-xs text-pretty text-muted-foreground">
-                  {content}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+      <main className="flex-1">
+        {/* Hero */}
+        <section className="paper-glow relative overflow-hidden">
+          <div className="mx-auto max-w-6xl px-4 pt-16 pb-20 text-center sm:px-6 sm:pt-24 sm:pb-28">
+            <p className="mx-auto inline-flex items-center gap-2 rounded-full border bg-card/70 px-3 py-1 text-xs font-medium text-muted-foreground shadow-paper animate-in fade-in-0 slide-in-from-bottom-2 duration-500">
+              <span className="size-1.5 rounded-full bg-primary" />
+              Free, private and built for writing
+            </p>
+
+            <h1 className="mx-auto mt-6 max-w-3xl font-serif text-[2.6rem] leading-[1.05] font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl animate-in fade-in-0 slide-in-from-bottom-3 duration-700">
+              A quiet place for{" "}
+              <em className="font-normal text-primary">everything</em> on your
+              mind.
+            </h1>
+
+            <p className="mx-auto mt-6 max-w-xl text-base text-pretty text-muted-foreground sm:text-lg animate-in fade-in-0 slide-in-from-bottom-3 duration-700 delay-100 fill-mode-backwards">
+              Parch is a calm, paper-like notebook. Capture ideas in rich text,
+              find them again in a keystroke, and let autosave take care of the
+              rest.
+            </p>
+
+            <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row animate-in fade-in-0 slide-in-from-bottom-3 duration-700 delay-200 fill-mode-backwards">
+              <Button asChild size="lg" className="group h-11 px-6 text-[0.95rem]">
+                <Link href="/register">
+                  Start writing, it&apos;s free
+                  <ArrowRightIcon className="transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="ghost" className="h-11 px-6 text-[0.95rem]">
+                <Link href="/login">I already have an account</Link>
+              </Button>
+            </div>
+
+            <div className="mt-16 sm:mt-20 animate-in fade-in-0 slide-in-from-bottom-6 duration-1000 delay-300 fill-mode-backwards">
+              <EditorPreview />
+            </div>
+          </div>
+        </section>
+
+        {/* Features */}
+        <section
+          aria-labelledby="features-heading"
+          className="border-t bg-paper/60"
+        >
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+            <div className="max-w-2xl">
+              <p className="text-sm font-medium text-primary">Why Parch</p>
+              <h2
+                id="features-heading"
+                className="mt-2 font-serif text-3xl font-semibold tracking-tight text-balance sm:text-4xl"
+              >
+                Everything a notebook should do. Nothing it shouldn&apos;t.
+              </h2>
+            </div>
+
+            <ul className="mt-12 grid gap-px overflow-hidden rounded-xl border bg-border sm:grid-cols-2 lg:grid-cols-3">
+              {features.map(({ title, content, Icon }) => (
+                <li
+                  key={title}
+                  className="group bg-card p-6 transition-colors hover:bg-paper sm:p-8"
+                >
+                  <span className="grid size-10 place-items-center rounded-lg bg-accent text-primary transition-transform duration-300 group-hover:-translate-y-0.5">
+                    <Icon className="size-5" />
+                  </span>
+                  <h3 className="mt-5 font-serif text-xl font-semibold tracking-tight">
+                    {title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {content}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* Closing CTA */}
+        <section className="border-t">
+          <div className="paper-lines mx-auto max-w-6xl px-4 py-20 text-center sm:px-6 sm:py-24">
+            <h2 className="mx-auto max-w-2xl font-serif text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
+              Your next good idea deserves a page.
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-muted-foreground">
+              Create an account in seconds and start with a blank sheet.
+            </p>
+            <Button asChild size="lg" className="group mt-8 h-11 px-6">
+              <Link href="/register">
+                Create your notebook
+                <ArrowRightIcon className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </Button>
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:px-6">
+          <Logo />
+          <p>Built with Next.js, TipTap and Auth.js.</p>
         </div>
-      </div>
+      </footer>
     </div>
   );
 }
