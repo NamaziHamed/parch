@@ -1,13 +1,22 @@
-const heights = ["h-40", "h-28", "h-52", "h-32", "h-24", "h-44", "h-36", "h-28"];
+const columns = [
+  ["h-40", "h-28", "h-36"],
+  ["h-28", "h-48"],
+  ["h-52", "h-24"],
+  ["h-32", "h-36", "h-24"],
+];
 
-/** Placeholder grid shown while notes or the grid code are loading. */
+/** Placeholder masonry shown while notes or the grid code are loading. */
 const NotesSkeleton = () => (
-  <div
-    aria-hidden
-    className="ps-20 pt-10 pe-3 grid gap-4 grid-cols-1 min-[500px]:grid-cols-2 min-[700px]:grid-cols-3 min-[1100px]:grid-cols-4"
-  >
-    {heights.map((h, i) => (
-      <div key={i} className={`${h} animate-pulse rounded-xl border bg-card`} />
+  <div aria-hidden className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+    {columns.map((col, c) => (
+      <div
+        key={c}
+        className={`flex flex-col gap-3 sm:gap-4 ${c === 2 ? "hidden lg:flex" : ""} ${c === 3 ? "hidden xl:flex" : ""}`}
+      >
+        {col.map((h, i) => (
+          <div key={i} className={`${h} animate-pulse rounded-xl border bg-card`} />
+        ))}
+      </div>
     ))}
   </div>
 );

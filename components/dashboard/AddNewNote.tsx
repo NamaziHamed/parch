@@ -1,14 +1,18 @@
 import React from "react";
 import Link from "next/link";
-import { PlusCircleIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 
+/** Desktop floating "new note" button; on mobile it lives in the bottom bar. */
 const AddNewNote = () => {
   return (
     <Link
-      className="flex gap-2 items-center fixed bottom-0 right-0 p-3 hover:scale-110 duration-300 transition-all"
       href={"/note/new"}
+      aria-label="New note"
+      className="fixed right-6 bottom-6 z-30 hidden size-14 items-center justify-center rounded-full
+        bg-primary text-primary-foreground shadow-lg shadow-primary/30
+        transition-transform hover:scale-105 active:scale-95 md:flex"
     >
-      <PlusCircleIcon className="text-primary w-10 h-10 " />
+      <PlusIcon className="size-7" />
     </Link>
   );
 };
