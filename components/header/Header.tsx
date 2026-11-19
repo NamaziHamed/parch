@@ -7,8 +7,8 @@ import { LogInIcon, UserPlus2 } from "lucide-react";
 const Header = () => {
   return (
     <header
-      className="fixed top-0 left-0 z-50 flex h-20 w-full items-center justify-between
-      border-b bg-card/80 px-4 backdrop-blur-md sm:px-6"
+      className="relative z-50 flex h-16 w-full shrink-0 items-center justify-between
+      border-b bg-card/80 px-4 backdrop-blur-md sm:h-20 sm:px-6"
     >
       <div>
         <Link href={"/"} aria-label="Parch home">
