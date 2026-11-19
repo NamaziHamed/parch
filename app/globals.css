@@ -121,52 +121,95 @@
   }
 }
 
-@layer utilities {
-  .tiptap {
-    @apply p-4 w-full outline-0;
+/* ---- Note editor: the writing surface ---- */
+@layer components {
+  .note-body {
+    @apply outline-none text-[1.0625rem] leading-[1.8] text-foreground/90;
+    font-family: var(--font-note), ui-serif, Georgia, serif;
+    caret-color: var(--primary);
   }
-  .tiptap > p {
-    @apply mb-3;
+  .note-body ::selection {
+    background: color-mix(in oklch, var(--primary) 30%, transparent);
   }
-  .tiptap:first-child {
+  .note-body > * + * {
+    @apply mt-3;
+  }
+  .note-body h1,
+  .note-body h2,
+  .note-body h3 {
+    @apply text-foreground text-pretty tracking-tight leading-snug;
+  }
+  .note-body h1 {
+    @apply mt-10 text-3xl font-bold;
+  }
+  .note-body h2 {
+    @apply mt-8 text-2xl font-semibold;
+  }
+  .note-body h3 {
+    @apply mt-6 text-xl font-semibold;
+  }
+  .note-body > :first-child {
     @apply mt-0;
   }
-  .tiptap ul,
-  .tiptap ol {
-    @apply px-6 py-1;
+  .note-body ul,
+  .note-body ol {
+    @apply ps-6;
   }
-  .tiptap ul {
+  .note-body ul {
     @apply list-disc;
   }
-  .tiptap ol {
+  .note-body ol {
     @apply list-decimal;
   }
-  .tiptap ul li p {
-    @apply mt-0.5 mb-0.5;
+  .note-body li::marker {
+    color: var(--primary);
   }
-  .tiptap h1,
-  .tiptap h2,
-  .tiptap h3 {
-    @apply leading-9 mt-2.5 text-pretty;
+  .note-body li > p {
+    @apply my-0.5;
   }
-  .tiptap h1,
-  .tiptap h2 {
-    @apply mt-3.5 mb-1.5 font-bold;
+  .note-body blockquote {
+    @apply border-s-2 border-primary/70 ps-4 italic text-muted-foreground;
   }
-  .tiptap h1 {
-    @apply text-3xl;
+  .note-body code {
+    @apply rounded bg-muted px-1.5 py-0.5 font-mono text-[0.85em];
   }
-  .tiptap h2 {
-    @apply text-2xl;
+  .note-body pre {
+    @apply overflow-x-auto rounded-lg border bg-card p-4 font-mono text-sm leading-relaxed;
   }
-  .tiptap h3 {
-    @apply text-xl font-semibold;
+  .note-body pre code {
+    @apply bg-transparent p-0;
   }
-  .tiptap p {
-    @apply text-sm;
+  .note-body hr {
+    @apply my-8 border-border;
   }
-  .checkList {
-    @apply flex gap-2 items-center justify-start;
+  .note-body a {
+    @apply text-primary underline underline-offset-4;
+  }
+
+  /* Checklists */
+  .note-body ul[data-type="taskList"] {
+    @apply list-none ps-0.5;
+  }
+  .note-body ul[data-type="taskList"] li {
+    @apply flex items-start gap-2.5;
+  }
+  .note-body ul[data-type="taskList"] li > label {
+    @apply mt-[0.4em] flex shrink-0 select-none;
+  }
+  .note-body ul[data-type="taskList"] li > label input {
+    @apply size-4 cursor-pointer accent-(--primary);
+  }
+  .note-body ul[data-type="taskList"] li > div {
+    @apply flex-1;
+  }
+  .note-body ul[data-type="taskList"] li[data-checked="true"] > div {
+    @apply text-muted-foreground line-through decoration-muted-foreground/60;
+  }
+
+  /* Placeholder from @tiptap/extensions */
+  .note-body .is-empty::before {
+    content: attr(data-placeholder);
+    @apply pointer-events-none float-left h-0 text-muted-foreground/45;
   }
 }
 

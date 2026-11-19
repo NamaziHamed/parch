@@ -14,23 +14,3 @@ export interface DashboardNote extends IPlainNotedata {
 export interface NoteData extends IPlainNotedata {
   jsonText: string | null;
 }
-
-export type EditorActiveState = {
-  isBold: boolean;
-  isUnderline: boolean;
-  isItalic: boolean;
-  isStrike: boolean;
-  isHeading1: boolean;
-  isHeading2: boolean;
-  isHeading3: boolean;
-  isBulletList: boolean;
-  isOrderedList: boolean;
-  isTaskList: boolean;
-  isParagraph: boolean;
-  isAlignLeft: boolean;
-  isAlignRight: boolean;
-  isAlignCenter: boolean;
-  isJustify: boolean;
-  currentBgColor: string;
-  currentTextColor: string;
-};
