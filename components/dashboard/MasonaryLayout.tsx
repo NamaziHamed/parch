@@ -9,8 +9,8 @@ import {
   CardTitle,
 } from "../ui/card";
 import Link from "next/link";
-import { NoteData } from "@/utils/types";
-import { DateTime } from "luxon";
+import { IPlainNotedata } from "@/utils/types";
+import { formatUpdatedAt } from "@/lib/formatDate";
 import { Button } from "../ui/button";
 import { Trash2 } from "lucide-react";
 
@@ -18,7 +18,7 @@ const MasonaryLayout = ({
   data,
   onRemove,
 }: {
-  data: NoteData[];
+  data: IPlainNotedata[];
   onRemove: (id: string) => void;
 }) => {
   const breakpointColumnsObj = {
@@ -26,16 +26,6 @@ const MasonaryLayout = ({
     1100: 3,
     700: 2,
     500: 1,
-  };
-
-  const formatedDate = (date: string) => {
-    const dt = DateTime.utc();
-    const ISODate = DateTime.fromISO(date);
-    const difference = dt.diff(ISODate, "day").as("day");
-
-    if (difference < 7) return ISODate.toRelative();
-
-    return ISODate.toFormat("dd LLL yyyy");
   };
 
   return (
@@ -82,8 +72,11 @@ const MasonaryLayout = ({
                 ))}
             </CardContent>
             <CardFooter className="mt-3">
-              <span className="text-[0.65rem] text-muted-foreground  truncate">
-                Last update: {formatedDate(note.updatedAt.toLocaleString())}
+              <span
+                className="text-[0.65rem] text-muted-foreground  truncate"
+                suppressHydrationWarning
+              >
+                Last update: {formatUpdatedAt(note.updatedAt)}
               </span>
             </CardFooter>
           </Link>

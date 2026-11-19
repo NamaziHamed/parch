@@ -1,13 +1,26 @@
 "use client";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import Tiptap from "@/components/textEditor/Tiptap";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowBigLeft, Loader2Icon } from "lucide-react";
-import { JSONContent } from "@tiptap/react";
+import type { JSONContent } from "@tiptap/react";
 import { toast } from "sonner";
 import { useParams, useRouter } from "next/navigation";
 import { NoteData } from "@/utils/types";
+
+// The editor (Tiptap + ProseMirror) is the heaviest code in the app, so it's
+// loaded in its own chunk after the page shell and title have rendered.
+const Tiptap = dynamic(() => import("@/components/textEditor/Tiptap"), {
+  ssr: false,
+  loading: () => (
+    <div className="bg-card rounded-b-xl min-h-[83vh] p-4 space-y-3" aria-hidden>
+      <div className="h-4 w-2/3 rounded bg-muted animate-pulse" />
+      <div className="h-4 w-1/2 rounded bg-muted animate-pulse" />
+      <div className="h-4 w-3/5 rounded bg-muted animate-pulse" />
+    </div>
+  ),
+});
 
 type NoteState = {
   title: string;

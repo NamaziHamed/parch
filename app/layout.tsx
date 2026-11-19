@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import Provider from "@/components/providers/Provider";
-import { Toaster } from "@/components/ui/sonner";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -23,7 +22,6 @@ export default function RootLayout({
       <body className={`${roboto.className} antialiased`}>
         <Provider>
           {children}
-          <Toaster />
         </Provider>
       </body>
     </html>

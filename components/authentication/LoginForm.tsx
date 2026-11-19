@@ -14,13 +14,11 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 import { loginProps, loginSchema } from "@/utils/authValidations";
 import { signInWithCredentials } from "@/utils/authActions";
 
 const LoginForm = () => {
   const router = useRouter();
-  const { update } = useSession();
 
   const form = useForm<loginProps>({
     resolver: zodResolver(loginSchema),
@@ -36,7 +34,6 @@ const LoginForm = () => {
       toast.error(res.error);
       return;
     }
-    await update();
     toast.success(`Logged in with ${data.email}`);
     router.push("/dashboard");
     router.refresh();

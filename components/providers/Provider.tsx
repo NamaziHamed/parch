@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { ThemeProvider } from "./theme-provider";
-import AuthProvider from "./auth-provider";
 
 export default function Provider({ children }: { children: ReactNode }) {
   return (
@@ -10,7 +9,7 @@ export default function Provider({ children }: { children: ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      <AuthProvider>{children}</AuthProvider>
+      {children}
     </ThemeProvider>
   );
 }
