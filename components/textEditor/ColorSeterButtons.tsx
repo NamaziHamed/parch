@@ -1,6 +1,6 @@
 "use client";
-import { debounce } from "lodash";
-import React from "react";
+import React, { useMemo } from "react";
+import { debounce } from "@/lib/utils";
 import { Editor } from "@tiptap/react";
 import { HexColorPicker } from "react-colorful";
 import { HighlighterIcon, PaletteIcon } from "lucide-react";
@@ -29,13 +29,18 @@ const ColorSeterButtons = ({ editor, editorState }: ColorToolProps) => {
     },
   ];
 
-  const handleColorChange = debounce((type: string, color: string) => {
-    if (type === "bg") {
-      editor.chain().focus().setBackgroundColor(color).run();
-    } else {
-      editor.chain().focus().setColor(color).run();
-    }
-  }, 300);
+  // Memoized so the debounce timer survives re-renders while dragging.
+  const handleColorChange = useMemo(
+    () =>
+      debounce((type: string, color: string) => {
+        if (type === "bg") {
+          editor.chain().focus().setBackgroundColor(color).run();
+        } else {
+          editor.chain().focus().setColor(color).run();
+        }
+      }, 300),
+    [editor]
+  );
 
   return (
     <div>

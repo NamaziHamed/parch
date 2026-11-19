@@ -47,7 +47,7 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
       isActive: editorState.isBold,
     },
     {
-      title: "Italice",
+      title: "Italic",
       Icon: ItalicIcon,
       command: () => editor.chain().focus().toggleItalic().run(),
       isActive: editorState.isItalic,

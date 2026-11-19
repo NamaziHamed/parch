@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Loader2 } from "lucide-react";
 import Sidebar from "@/components/dashboard/Sidebar";
@@ -13,23 +13,17 @@ import { toast } from "sonner";
 const DashboardPage = () => {
   const { data: session, status } = useSession();
   const [data, setData] = useState<NoteData[]>([]);
-  const [filtered, setFiltered] = useState(data);
   const [searchText, setSearchText] = useState("");
 
-  const handleSearch = (value: string) => {
-    setSearchText(value);
-    if (value.length) {
-      const res = data.filter((note) => {
-        const search =
-          note.plainText?.toLowerCase().includes(value) ||
-          note.title?.toLowerCase().includes(value);
-        if (search) return note;
-      });
-      setFiltered(res);
-    } else {
-      setFiltered(data);
-    }
-  };
+  const filtered = useMemo(() => {
+    const query = searchText.trim().toLowerCase();
+    if (!query) return data;
+    return data.filter(
+      (note) =>
+        note.plainText?.toLowerCase().includes(query) ||
+        note.title?.toLowerCase().includes(query)
+    );
+  }, [data, searchText]);
 
   useEffect(() => {
     const fetchUserNotes = async () => {
@@ -37,7 +31,6 @@ const DashboardPage = () => {
         const res = await axios.get("/api/note");
         if (res.status === 200) {
           setData(res.data);
-          setFiltered(res.data);
           return;
         }
       } catch (error) {
@@ -52,8 +45,7 @@ const DashboardPage = () => {
     try {
       const res = await axios.delete(`/api/note/${id}`);
       if (res.status === 200) {
-        setData(data.filter((note) => note.id != id));
-        setFiltered(filtered.filter((note) => note.id !== id));
+        setData((prev) => prev.filter((note) => note.id !== id));
         toast.success("Note deleted successfully");
       } else {
         toast.error("Something went wrong! please try again!");
@@ -79,7 +71,7 @@ const DashboardPage = () => {
           <h2 className="font-semibold text-2xl text-primary mb-4">
             All notes
           </h2>
-          <SearchBox text={searchText} search={handleSearch} />
+          <SearchBox text={searchText} search={setSearchText} />
         </div>
         <MasonaryLayout data={filtered} onRemove={handleRemove} />
       </div>

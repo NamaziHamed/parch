@@ -21,7 +21,7 @@ const features = [
     id: 1,
     title: "Easy signup",
     content:
-      "Using out third party login system, you can register and login on the go",
+      "Using our third party login system, you can register and login on the go",
     Icon: FastForwardIcon,
     iconColor: "text-red-500",
   },

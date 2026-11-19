@@ -1,58 +1,32 @@
+import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { NextRequest, NextResponse } from "next/server";
-import { generateText } from "@tiptap/core";
-import StarterKit from "@tiptap/starter-kit";
 import { prisma } from "@/lib/prisma";
-import { TaskItem, TaskList } from "@tiptap/extension-list";
-import {
-  BackgroundColor,
-  Color,
-  TextStyle,
-} from "@tiptap/extension-text-style";
-import TextAlign from "@tiptap/extension-text-align";
-import { toast } from "sonner";
+import { readNoteBody } from "@/lib/noteText";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const session = await auth();
-  if (!session?.user?.id) {
+  const userId = session?.user?.id;
+  if (!userId)
     return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
-  }
-  const userId = session.user.id;
+
+  const note = await readNoteBody(req);
+  if (!note)
+    return NextResponse.json({ message: "Invalid request" }, { status: 400 });
 
   try {
-    const body = await req.json();
-    const { title, jsonText } = body;
-    const plainText = "";
-
-    try {
-      generateText(jsonText, [
-        StarterKit,
-        TextStyle,
-        BackgroundColor,
-        TaskList,
-        Color,
-        TaskItem,
-        TextAlign,
-      ]);
-    } catch (error) {
-      toast.error("Failed to generate plain text from note content.");
-      console.error("Error generating plain text:", error);
-    }
-
     const newNote = await prisma.note.create({
       data: {
-        title: title || "",
-        jsonText: JSON.stringify(jsonText),
-        plainText,
+        title: note.title,
+        jsonText: JSON.stringify(note.jsonText),
+        plainText: note.plainText,
         userId,
       },
     });
-
     return NextResponse.json(newNote, { status: 201 });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Create note failed", error);
     return NextResponse.json(
-      { message: "Internal server error!" },
+      { message: "Internal server error" },
       { status: 500 }
     );
   }
@@ -65,7 +39,7 @@ export async function GET() {
     return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
 
   try {
-    const res = await prisma.note.findMany({
+    const notes = await prisma.note.findMany({
       where: { userId },
       select: {
         id: true,
@@ -74,14 +48,13 @@ export async function GET() {
         createdAt: true,
         updatedAt: true,
       },
-      orderBy: {
-        updatedAt: "desc",
-      },
+      orderBy: { updatedAt: "desc" },
     });
-    return NextResponse.json(res, { status: 200 });
+    return NextResponse.json(notes, { status: 200 });
   } catch (error) {
+    console.error("List notes failed", error);
     return NextResponse.json(
-      { message: "Internal server error!" + error },
+      { message: "Internal server error" },
       { status: 500 }
     );
   }

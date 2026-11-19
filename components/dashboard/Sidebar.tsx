@@ -11,7 +11,9 @@ const Sidebar = ({ session }: { session: Session | null }) => {
       <div className="flex items-center flex-col">
         <Avatar>
           <AvatarImage src={session?.user?.image ?? ""} />
-          <AvatarFallback>{session?.user?.name?.slice(0)}</AvatarFallback>
+          <AvatarFallback>
+            {session?.user?.name?.charAt(0).toUpperCase() ?? "?"}
+          </AvatarFallback>
         </Avatar>
         <p className="max-w-20 text-xs truncate">
           {session?.user?.name?.split(" ")[0]}

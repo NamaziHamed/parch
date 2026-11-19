@@ -1,143 +1,78 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
-import StarterKit from "@tiptap/starter-kit";
-import { generateText } from "@tiptap/core";
-import { TaskItem, TaskList } from "@tiptap/extension-list";
-import {
-  BackgroundColor,
-  Color,
-  TextStyle,
-} from "@tiptap/extension-text-style";
-import TextAlign from "@tiptap/extension-text-align";
+import { readNoteBody } from "@/lib/noteText";
 
-export async function POST(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+type Context = { params: Promise<{ id: string }> };
+
+const unauthorized = () =>
+  NextResponse.json({ message: "Not Authorized" }, { status: 401 });
+const notFound = () =>
+  NextResponse.json({ message: "Note not found" }, { status: 404 });
+const serverError = (error: unknown) => {
+  console.error(error);
+  return NextResponse.json(
+    { message: "Internal server error" },
+    { status: 500 }
+  );
+};
+
+async function updateNote(req: Request, context: Context) {
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId)
-    return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
+  if (!userId) return unauthorized();
 
   const { id } = await context.params;
-
-  const body = await req.json();
-  const { title, jsonText } = body;
-  const plainText = generateText(jsonText, [
-    StarterKit,
-    TextStyle,
-    BackgroundColor,
-    Color,
-    TaskItem,
-    TaskList,
-    TextAlign,
-  ]);
+  const note = await readNoteBody(req);
+  if (!note)
+    return NextResponse.json({ message: "Invalid request" }, { status: 400 });
 
   try {
-    const updatedNote = await prisma.note.update({
-      data: { title, jsonText: JSON.stringify(jsonText), plainText },
+    const { count } = await prisma.note.updateMany({
       where: { id, userId },
+      data: {
+        title: note.title,
+        jsonText: JSON.stringify(note.jsonText),
+        plainText: note.plainText,
+      },
     });
-    if (updatedNote)
-      return NextResponse.json({ message: "Note updated" }, { status: 200 });
+    if (!count) return notFound();
+    return NextResponse.json({ message: "Note updated" }, { status: 200 });
   } catch (error) {
-    return NextResponse.json(
-      { message: "Internal server error" + error },
-      { status: 500 }
-    );
+    return serverError(error);
   }
 }
 
-export async function PUT(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+// POST is kept alongside PUT because navigator.sendBeacon can only POST.
+export const POST = updateNote;
+export const PUT = updateNote;
+
+export async function GET(_req: Request, context: Context) {
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId)
-    return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
+  if (!userId) return unauthorized();
 
   const { id } = await context.params;
-
-  const body = await req.json();
-  const { title, jsonText } = body;
-  const plainText = generateText(jsonText, [
-    StarterKit,
-    TextStyle,
-    BackgroundColor,
-    Color,
-    TaskItem,
-    TaskList,
-    TextAlign,
-  ]);
   try {
-    const updatedNote = await prisma.note.update({
-      data: { title, jsonText: JSON.stringify(jsonText), plainText },
-      where: { id, userId },
-    });
-    if (updatedNote)
-      return NextResponse.json({ message: "Note updated" }, { status: 200 });
+    const note = await prisma.note.findFirst({ where: { id, userId } });
+    if (!note) return notFound();
+    return NextResponse.json(note, { status: 200 });
   } catch (error) {
-    return NextResponse.json(
-      { message: "Internal server error" + error },
-      { status: 500 }
-    );
+    return serverError(error);
   }
 }
 
-export async function GET(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(_req: Request, context: Context) {
   const session = await auth();
   const userId = session?.user?.id;
+  if (!userId) return unauthorized();
+
   const { id } = await context.params;
-  if (!userId)
-    return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
-
   try {
-    const noteData = await prisma.note.findUnique({
-      where: { id },
-    });
-    if (!noteData)
-      return NextResponse.json(
-        { message: "Something went wrong" },
-        { status: 500 }
-      );
-    return NextResponse.json(noteData, { status: 200 });
+    const { count } = await prisma.note.deleteMany({ where: { id, userId } });
+    if (!count) return notFound();
+    return NextResponse.json({ message: "Note deleted" }, { status: 200 });
   } catch (error) {
-    return NextResponse.json(
-      { message: "Internal server Error: " + error },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
-  const session = await auth();
-  const userId = session?.user?.id;
-  const { id } = await context.params;
-  if (!userId)
-    return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
-
-  try {
-    const res = await prisma.note.delete({
-      where: { id, userId },
-    });
-    if (!res)
-      return NextResponse.json(
-        { message: "Something went wrong" },
-        { status: 500 }
-      );
-    return NextResponse.json({ status: 200 });
-  } catch (error) {
-    return NextResponse.json(
-      { message: "Internal server Error: " + error },
-      { status: 500 }
-    );
+    return serverError(error);
   }
 }

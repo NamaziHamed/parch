@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { loginProps, loginSchema } from "@/utils/authValidations";
-import { registerWithCredentials as register } from "@/utils/authActions";
+import { signInWithCredentials } from "@/utils/authActions";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -31,16 +31,15 @@ const LoginForm = () => {
   });
 
   const onSubmit = async (data: loginProps) => {
-    try {
-      await register(data);
-      await update();
-      toast.success(`Logged in with ${data.email}`);
-      router.push("/dashboard");
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else toast.error("Something went wrong");
+    const res = await signInWithCredentials(data);
+    if (!res.success) {
+      toast.error(res.error);
+      return;
     }
+    await update();
+    toast.success(`Logged in with ${data.email}`);
+    router.push("/dashboard");
+    router.refresh();
   };
 
   return (

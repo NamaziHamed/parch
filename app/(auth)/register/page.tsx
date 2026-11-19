@@ -6,7 +6,7 @@ const page = () => {
   return (
     <FormWrapper
       title="Create Account"
-      description="Welcome to Apex Agenda"
+      description="Start writing with Parch"
       isLogin={false}
     >
       <RegisterForm />

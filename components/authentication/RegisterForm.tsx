@@ -31,15 +31,13 @@ const RegisterForm = () => {
   });
 
   const onSubmit = async (data: registerProps) => {
-    try {
-      await register(data);
-      toast.success("Account created successfully!");
-      router.push("/login");
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else toast.error("Something went wrong");
+    const res = await register(data);
+    if (!res.success) {
+      toast.error(res.error);
+      return;
     }
+    toast.success("Account created! You can log in now.");
+    router.push("/login");
   };
 
   return (
