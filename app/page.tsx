@@ -13,7 +13,7 @@ const features = [
   {
     id: 2,
     title: "Search system",
-    content: "You can search your notes with title or text",
+    content: "Find any note instantly by its title or its content.",
     Icon: SearchCheckIcon,
     iconColor: "text-blue-500",
   },
@@ -21,7 +21,7 @@ const features = [
     id: 1,
     title: "Easy signup",
     content:
-      "Using our third party login system, you can register and login on the go",
+      "Sign in with Google or email and start writing in seconds.",
     Icon: FastForwardIcon,
     iconColor: "text-red-500",
   },
@@ -30,7 +30,7 @@ const features = [
     id: 3,
     title: "User Friendly tools",
     content:
-      "No extra tools, just the things you need. headings, text alignment, lists, color and highlight changer",
+      "No clutter, just what you need: headings, alignment, lists, colors and highlights.",
     Icon: LucideToolCase,
     iconColor: "text-violet-300",
   },
@@ -38,53 +38,64 @@ const features = [
 
 export default function Home() {
   return (
-    <div className="min-w-screen min-h-screen relative">
-      <div className="absolute top-0 left-0 inset-0 bg-[url('/banner.png')] bg-cover bg-center z-0 opacity-40"></div>
+    <div className="relative min-h-svh overflow-x-hidden">
+      {/* Background photo + a soft fade so text stays readable on top of it */}
+      <div
+        aria-hidden
+        className="fixed inset-0 -z-10 bg-[url('/banner.png')] bg-cover bg-center opacity-40"
+      />
+      <div
+        aria-hidden
+        className="fixed inset-0 -z-10 bg-linear-to-b from-background/70 via-background/20 to-background/90"
+      />
       <Header />
-      <div className=" pt-20 absolute min-w-screen min-h-screen flex flex-col justify-around items-center">
-        <div
-          className="
-          flex items-center justify-center flex-col text-white z-40 space-y-5"
-        >
-          <h2 className="font-bold text-pretty text-primary text-4xl md:text-5xl lg:text-6xl xl:text-7xl
-            animate-in slide-in-from-top-80 duration-500 fade-in-0
-          ">
+      <main className="flex min-h-svh flex-col items-center justify-around gap-10 px-4 pt-28 pb-10">
+        <div className="flex flex-col items-center justify-center space-y-5 text-center">
+          <h1
+            className="font-bold text-balance text-primary text-5xl sm:text-6xl lg:text-7xl
+            animate-in slide-in-from-top-80 duration-500 fade-in-0 drop-shadow-sm"
+          >
             Your second brain is here!
-          </h2>
-          <p>Write down your thoughts, get them out of your head!</p>
+          </h1>
+          <p className="max-w-md text-pretty text-base text-foreground/90 sm:text-lg">
+            Write down your thoughts, get them out of your head!
+          </p>
           <Button
             asChild
             size={"lg"}
-            className="group hover:-translate-y-0.5 
-              animate-in slide-in-from-bottom-80 duration-500 fade-in-0
-              scale-110 transition-all "
+            className="group h-11 px-7 text-base shadow-lg shadow-primary/20 transition-all
+              hover:-translate-y-0.5 hover:shadow-primary/30
+              animate-in slide-in-from-bottom-80 duration-500 fade-in-0"
           >
             <Link href={"/register"}>
-              <ArrowRightIcon className="group-hover:animate-caret-blink" /> Get
-              started
+              Get started
+              <ArrowRightIcon className="transition-transform group-hover:translate-x-1" />
             </Link>
           </Button>
         </div>
 
-        <div className="grid grid-cols-1  md:grid-cols-3 gap-2 md:gap-5 py-10 max-w-3xl">
+        <div className="grid w-full max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3 md:gap-5">
           {features.map(({ id, title, content, Icon, iconColor }) => (
             <Card
               key={id}
-              className="shadow-none hover:scale-105 hover:-translate-y-0.5 duration-300 transition-all"
+              className="bg-card/85 backdrop-blur-sm shadow-none transition-all duration-300
+                hover:-translate-y-1 hover:border-primary/40"
             >
-              <CardContent>
-                <CardTitle className="font-semibold italic mb-3 text-center">
+              <CardContent className="flex flex-col items-center text-center">
+                <span className="mb-3 flex size-9 items-center justify-center rounded-full bg-muted">
+                  <Icon className={`size-5 ${iconColor}`} />
+                </span>
+                <CardTitle className="font-semibold italic mb-2">
                   {title}
                 </CardTitle>
-                <Icon className={`w-5 h-5 mx-auto ${iconColor} mb-1`} />
-                <p className="text-xs text-pretty text-muted-foreground">
+                <p className="text-xs text-pretty leading-relaxed text-muted-foreground">
                   {content}
                 </p>
               </CardContent>
             </Card>
           ))}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
